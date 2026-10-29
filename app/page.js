@@ -21,7 +21,7 @@ const CLIENT_CONFIG = {
   logoUrl: "/logo.png",
 
   // TODO: Place ID daalo (Google "Place ID Finder" ya Business Profile se).
-  googleReviewUrl: "https://search.google.com/local/writereview?placeid=PASTE_PLACE_ID_HERE",
+  googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJQ7FvGR39DDkR_cX-F2Y0OfA",
   mapsDirectionUrl:
     "https://www.google.com/maps/search/?api=1&query=" +
     encodeURIComponent("Zaika Punjabi Rasoi, C-2/341, Block C, Yamuna Vihar, Delhi 110053"),
@@ -570,7 +570,7 @@ END:VCARD`;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          box-shadow: 0 14px 34px rgba(20, 81, 59, 0.25), 0 6px 14px rgba(0,0,0,0.12);
+          box-shadow: 0 14px 34px rgba(110, 21, 29, 0.25), 0 6px 14px rgba(0,0,0,0.12);
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
           border: 3px solid #d1b183;
@@ -590,7 +590,7 @@ END:VCARD`;
           font-family: Georgia, serif;
           font-size: 26px;
           font-weight: 800;
-          color: #0d3b2c;
+          color: #591016;
           margin: 0 0 4px;
           letter-spacing: 0.3px;
         }
@@ -646,7 +646,7 @@ END:VCARD`;
           padding: 6px 14px;
           font-size: 11px;
           background: #ffffff;
-          color: #0d3b2c;
+          color: #591016;
           border: 1px solid #ebd9c3;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(180, 155, 130, 0.08);
@@ -656,10 +656,10 @@ END:VCARD`;
           transform: scale(0.95);
         }
         .embossed-pill.active {
-          background: radial-gradient(circle at 30% 30%, #1d6b4f 0%, #0d3b2c 100%);
+          background: radial-gradient(circle at 30% 30%, #831d27 0%, #591016 100%);
           color: #ffffff;
-          border-color: #0d3b2c;
-          box-shadow: 0 4px 14px rgba(20, 81, 59, 0.25);
+          border-color: #591016;
+          box-shadow: 0 4px 14px rgba(110, 21, 29, 0.25);
         }
         .capsule-lang-dock {
           display: inline-flex;
@@ -682,9 +682,9 @@ END:VCARD`;
           cursor: pointer;
         }
         .capsule-lang-btn.active {
-          background: #14513b;
+          background: #6e151d;
           color: #ffffff;
-          box-shadow: 0 3px 8px rgba(20, 81, 59, 0.28);
+          box-shadow: 0 3px 8px rgba(110, 21, 29, 0.28);
         }
         .signature-review-box {
           width: 100%;
@@ -695,7 +695,7 @@ END:VCARD`;
           box-shadow: 0 14px 34px rgba(160, 130, 100, 0.13);
           margin-bottom: 16px;
           text-align: left;
-          border-top: 4px solid #14513b;
+          border-top: 4px solid #6e151d;
           color: #2b2016;
         }
         .box-top-ribbon {
@@ -718,7 +718,7 @@ END:VCARD`;
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #14513b;
+          background: #6e151d;
         }
         .top-rewrite-btn {
           display: inline-flex;
@@ -727,7 +727,7 @@ END:VCARD`;
           border-radius: 999px;
           background: #fbf7f1;
           border: 1px solid #ebd9c3;
-          color: #14513b;
+          color: #6e151d;
           font-size: 10.5px;
           font-weight: 650;
           cursor: pointer;
@@ -773,7 +773,7 @@ END:VCARD`;
           display: inline-block;
           width: 2px;
           height: 13px;
-          background: #14513b;
+          background: #6e151d;
           margin-left: 3px;
           vertical-align: middle;
           animation: blink 0.7s infinite;
@@ -792,13 +792,13 @@ END:VCARD`;
           width: 100%;
           height: 50px;
           border-radius: 999px;
-          background: linear-gradient(180deg, #17583f 0%, #0f3f2e 100%);
+          background: linear-gradient(180deg, #781a23 0%, #5c1218 100%);
           border: none;
           color: #ffffff;
           font-size: 12px;
           font-weight: 750;
           cursor: pointer;
-          box-shadow: 0 8px 22px rgba(20, 81, 59, 0.32);
+          box-shadow: 0 8px 22px rgba(110, 21, 29, 0.32);
           transition: transform 0.15s ease;
         }
         .full-luxury-copy-btn:disabled {
@@ -874,7 +874,7 @@ END:VCARD`;
         .icon-disc svg {
           width: 20px;
           height: 20px;
-          stroke: #0d3b2c;
+          stroke: #591016;
           transition: stroke 0.2s ease;
         }
         .whatsapp-disc:hover { background: #25d366; border-color: #25d366; }
@@ -883,7 +883,7 @@ END:VCARD`;
         .call-disc:hover { background: #007aff; border-color: #007aff; }
         .call-disc:hover svg { stroke: #ffffff; }
 
-        .contact-disc:hover { background: #0d3b2c; border-color: #0d3b2c; }
+        .contact-disc:hover { background: #591016; border-color: #591016; }
         .contact-disc:hover svg { stroke: #ffffff; }
 
         .map-disc:hover { background: #ea4335; border-color: #ea4335; }
@@ -924,7 +924,7 @@ END:VCARD`;
           gap: 6px;
           font-size: 11.5px;
           font-weight: 800;
-          color: #0d3b2c;
+          color: #591016;
           margin-bottom: 8px;
         }
         .map-iframe-container {
