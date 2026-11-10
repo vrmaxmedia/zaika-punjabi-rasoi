@@ -1,18 +1,16 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // =====================================================================
-//  SIRF YE BLOCK BADALNA HAI HAR NAYE CLIENT KE LIYE (+ public/logo.png)
-//  "TODO" wali lines ko restaurant owner se confirm karke bharna hai.
+//  CLIENT CONFIGURATION (Zaika Punjabi Rasoi - Yamuna Vihar)
 // =====================================================================
 const CLIENT_CONFIG = {
-  clientId: "zaika_punjabi_rasoi_01",
   businessName: "Zaika Punjabi Rasoi",
   subHeading: "Punjabi Restaurant in Yamuna Vihar, Delhi",
-  tagline: "PUNJABI FOOD • HAPPY HOUR • VEGAN OPTIONS • 4.7★ ON GOOGLE",
+  tagline: "AUTHENTIC PUNJABI FOOD • HYGIENIC DINING • FAMILY RESTAURANT",
   description:
-    "Popular Punjabi restaurant in Yamuna Vihar, Delhi, rated 4.7 on Google by 500+ diners. Happy-hour food, vegan options, a lively dining space and a good spot to watch a match.",
+    "Popular Punjabi restaurant in Yamuna Vihar, Delhi, rated 4.7 on Google by 500+ diners. Serving delicious North Indian dishes, fresh breads, starters, and mouth-watering meals.",
   city: "Yamuna Vihar, Delhi 110053",
   areaLabel: "Yamuna Vihar, Delhi",
   fullAddress: "Ground Floor, C-2/341, near Punjabi Rasoi, Block C, Yamuna Vihar, Delhi, 110053",
@@ -20,99 +18,30 @@ const CLIENT_CONFIG = {
   cleanPhone: "919311060505",
   logoUrl: "/logo.png",
 
-  // Theme: "auto" = phone ki setting ke hisab se dark/light, "dark" = hamesha dark, "light" = hamesha light
-  themeMode: "auto",
-
-  // TODO: Place ID daalo (Google "Place ID Finder" ya Business Profile se).
   googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJQ7FvGR39DDkR_cX-F2Y0OfA",
   mapsDirectionUrl:
     "https://www.google.com/maps/search/?api=1&query=" +
     encodeURIComponent("Zaika Punjabi Rasoi, C-2/341, Block C, Yamuna Vihar, Delhi 110053"),
 
-  // Khali "" chhodoge to button apne aap chhup jayega.
   instagramUrl: "",
   facebookUrl: "",
   youtubeUrl: "",
 
-  // VR Max AI (agency) contact
   agencyName: "VR Max AI",
   agencyWhatsapp: "918700660097",
   agencyPhoneDisplay: "+91 87006 60097",
 
-  // Chips: topic = neeche reviewProfile.topics ki id, null = random (All)
+  // Root file ke chips ke sath exact matching list
   chips: [
-    { label: "All", topic: null, context: "overall dining experience at the restaurant" },
-    { label: "Taste & Food", topic: "taste", context: "tasty Punjabi food" },
-    { label: "Service", topic: "service", context: "polite and quick staff" },
-    { label: "Ambience", topic: "ambience", context: "interiors, seating and vibe" },
-    { label: "Value for Money", topic: "value", context: "fair prices for the quality" },
-    { label: "Happy Hour", topic: "happyhour", context: "happy-hour food, friends, watching a match" },
-    { label: "Vegan Options", topic: "vegan", context: "good vegan and vegetarian choices" },
+    'Best Taste',
+    'Pocket Friendly',
+    'Family Friendly',
+    'Fresh & Hot',
+    'Clean Ambience',
+    'Fast Service',
+    'Yamuna Vihar',
+    'Good Quantity',
   ],
-
-  // Ye data API ko jata hai, reviews isi se likhe jate hain.
-  reviewProfile: {
-    writerRole: "a customer who just had a meal at this restaurant",
-    itemLabel: "dish or drink",
-    // TODO: owner se asli menu confirm karo, sirf wahi dishes rakho jo sach mein milti hain.
-    items: ["dal makhani", "paneer butter masala", "butter naan", "lassi", "chole bhature"],
-    seoKeywords: [
-      "Punjabi restaurant in Yamuna Vihar",
-      "best Punjabi food in Delhi",
-      "restaurant in Yamuna Vihar Delhi",
-      "Punjabi Rasoi Yamuna Vihar",
-      "family restaurant near Yamuna Vihar",
-      "vegan options in Delhi",
-    ],
-    staffName: null, // naam likhoge to kabhi kabhi review mein aayega
-    openers: [
-      "start with the food or what you ordered",
-      "start with the restaurant or the area",
-      "start with the staff or owner",
-      "start with how you feel now",
-      "start with why you came here",
-      "start in the middle of a thought, casually",
-    ],
-    avoid: ["Do not describe the menu as a full list, mention at most one or two dishes."],
-    allTopics: ["taste", "service", "ambience", "value", "location"],
-    topics: [
-      {
-        id: "taste",
-        text: "the food: tasty authentic Punjabi flavours, fresh and well cooked, good portion, would order again",
-        must: "taste|swaad|zaika|tasty|flavou?r|spice|masala|food|khana|dal|paneer|naan|roti|lassi|chicken|curry|fresh|portion|delicious|mazedar|lajawab",
-      },
-      {
-        id: "service",
-        text: "the service: staff polite and quick, food served on time, attentive without being pushy",
-        must: "staff|service|polite|behav|waiter|serve|attend|manager|owner|respect|welcome|quick|fast|jaldi|helpful|nature",
-      },
-      {
-        id: "ambience",
-        text: "the ambience: nice interiors, comfortable seating, clean, a good place to sit with family or friends",
-        must: "ambien|vibe|decor|interior|seating|clean|saaf|mahaul|atmosphere|baith|comfort|lighting|crowd|space|chandelier",
-      },
-      {
-        id: "value",
-        text: "value for money: fair prices for the quality and quantity, felt worth it, the bill was reasonable",
-        must: "price|rate|daam|paise|paisa|value|budget|pocket|worth|affordable|sasta|saste|reasonable|bill|vasool",
-      },
-      {
-        id: "location",
-        text: "the location: easy to find in Yamuna Vihar, convenient to reach",
-        must: "location|jagah|rasta|yamuna|vihar|block|easy to find|aasani|nazdik|paas|parking|area|market|road",
-      },
-      {
-        id: "vegan",
-        text: "the vegan and vegetarian options: good choice available, tasty even for veg people",
-        must: "vegan|veg|vegetarian|plant|options|choice",
-      },
-      {
-        id: "happyhour",
-        text: "the happy-hour food and the lively vibe, a good place to hang out with friends and watch a match",
-        must: "happy|hour|evening|snack|starter|sport|match|watch|screen|friends|group|hangout|dost",
-      },
-    ],
-  },
 };
 
 const HAS_SOCIAL = !!(CLIENT_CONFIG.instagramUrl || CLIENT_CONFIG.facebookUrl || CLIENT_CONFIG.youtubeUrl);
@@ -158,9 +87,7 @@ async function copyToClipboard(text) {
       await navigator.clipboard.writeText(text);
       return true;
     }
-  } catch (e) {
-    // fallback neeche
-  }
+  } catch (e) {}
   try {
     const ta = document.createElement("textarea");
     ta.value = text;
@@ -169,7 +96,6 @@ async function copyToClipboard(text) {
     ta.style.opacity = "0";
     document.body.appendChild(ta);
     ta.select();
-    ta.setSelectionRange(0, text.length);
     const ok = document.execCommand("copy");
     ta.remove();
     return ok;
@@ -178,10 +104,10 @@ async function copyToClipboard(text) {
   }
 }
 
-export default function UniversalReviewPage() {
+export default function RestaurantReviewPage() {
   const [mounted, setMounted] = useState(false);
-  const [selectedChipObj, setSelectedChipObj] = useState(CLIENT_CONFIG.chips[0]);
-  const [language, setLanguage] = useState("ENGLISH");
+  const [selectedChips, setSelectedChips] = useState([]);
+  const [language, setLanguage] = useState("HINGLISH");
   const [reviewDraft, setReviewDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -200,7 +126,7 @@ export default function UniversalReviewPage() {
     };
   }, []);
 
-  const generateAIReview = useCallback(async (chipObj, lang) => {
+  const generateAIReview = useCallback(async (chipsToUse, lang) => {
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -212,8 +138,6 @@ export default function UniversalReviewPage() {
     setReviewDraft("");
 
     try {
-      const effectiveFocus = `${chipObj.label} (Context cues: ${chipObj.context})`;
-
       const res = await fetch("/api/reviews", {
         method: "POST",
         signal: controller.signal,
@@ -224,13 +148,10 @@ export default function UniversalReviewPage() {
           category: CLIENT_CONFIG.tagline,
           description: CLIENT_CONFIG.description,
           city: CLIENT_CONFIG.city,
-          selectedService: effectiveFocus,
-          chipTopic: chipObj.topic || null,
-          profile: CLIENT_CONFIG.reviewProfile,
+          selectedChips: chipsToUse,
           language: lang,
           nonce: Math.random().toString(36).substring(2, 12),
           timestamp: Date.now(),
-          randomSeed: Math.floor(Math.random() * 100000),
           recentLengths: recentLengthsRef.current,
         }),
       });
@@ -256,21 +177,27 @@ export default function UniversalReviewPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    generateAIReview(selectedChipObj, language);
+    generateAIReview(selectedChips, language);
     return () => abortControllerRef.current?.abort();
-  }, [mounted, selectedChipObj, language, generateAIReview]);
+  }, [mounted, selectedChips, language, generateAIReview]);
 
-  function handleChipChange(chipObj) {
-    if (chipObj.label === selectedChipObj.label) {
-      generateAIReview(chipObj, language);
-      return;
+  function toggleChip(chip) {
+    let updated;
+    if (selectedChips.includes(chip)) {
+      updated = selectedChips.filter((c) => c !== chip);
+    } else {
+      if (selectedChips.length >= 3) {
+        alert("Aap max 3 chips select kar sakte hain.");
+        return;
+      }
+      updated = [...selectedChips, chip];
     }
-    setSelectedChipObj(chipObj);
+    setSelectedChips(updated);
   }
 
   function handleLanguageChange(lang) {
     if (lang === language) {
-      generateAIReview(selectedChipObj, lang);
+      generateAIReview(selectedChips, lang);
       return;
     }
     setLanguage(lang);
@@ -310,10 +237,10 @@ END:VCARD`;
     URL.revokeObjectURL(url);
   }
 
-  if (!mounted) return <div style={{ minHeight: "100vh", backgroundColor: "#10201d" }} />;
+  if (!mounted) return <div style={{ minHeight: "100vh", backgroundColor: "#0a0505" }} />;
 
   return (
-    <main className="soft-luxury-viewport" data-theme={CLIENT_CONFIG.themeMode}>
+    <main className="soft-luxury-viewport">
       <div className="main-content-flow">
         {/* Logo */}
         <div className="brand-medallion-badge">
@@ -343,15 +270,15 @@ END:VCARD`;
         {/* Filter Chips */}
         <div className="floating-pills-cloud">
           {CLIENT_CONFIG.chips.map((chip) => {
-            const active = selectedChipObj.label === chip.label;
+            const active = selectedChips.includes(chip);
             return (
               <button
-                key={chip.label}
+                key={chip}
                 type="button"
-                onClick={() => handleChipChange(chip)}
+                onClick={() => toggleChip(chip)}
                 className={`embossed-pill ${active ? "active" : ""}`}
               >
-                {chip.label}
+                {chip} {active && "✓"}
               </button>
             );
           })}
@@ -384,7 +311,7 @@ END:VCARD`;
             <button
               type="button"
               disabled={loading || isTyping}
-              onClick={() => generateAIReview(selectedChipObj, language)}
+              onClick={() => generateAIReview(selectedChips, language)}
               className="top-rewrite-btn"
             >
               <span>Rewrite</span>
@@ -460,34 +387,21 @@ END:VCARD`;
             </div>
 
             <div className="action-row-lower" style={HAS_SOCIAL ? undefined : { display: "none" }}>
-              {/* Instagram */}
               {CLIENT_CONFIG.instagramUrl && (
                 <a href={CLIENT_CONFIG.instagramUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc insta-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                </div>
-                <span className="icon-tag">Instagram</span>
-              </a>
+                  <div className="icon-disc insta-disc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  </div>
+                  <span className="icon-tag">Instagram</span>
+                </a>
               )}
-
-              {/* Facebook */}
               {CLIENT_CONFIG.facebookUrl && (
                 <a href={CLIENT_CONFIG.facebookUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc fb-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                </div>
-                <span className="icon-tag">Facebook</span>
-              </a>
-              )}
-
-              {/* YouTube */}
-              {CLIENT_CONFIG.youtubeUrl && (
-                <a href={CLIENT_CONFIG.youtubeUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc yt-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor"/></svg>
-                </div>
-                <span className="icon-tag">YouTube</span>
-              </a>
+                  <div className="icon-disc fb-disc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  </div>
+                  <span className="icon-tag">Facebook</span>
+                </a>
               )}
             </div>
           </div>
@@ -539,62 +453,24 @@ END:VCARD`;
       </div>
 
       <style jsx global>{`
-        /* ===== THEME: Midnight Teal + Saffron (dark default, light optional) ===== */
+        /* ===== THEME: Rich Red & Dark Luxury ===== */
         .soft-luxury-viewport {
-          --bg: #10201d;
-          --card: #162a26;
-          --soft: #1c332e;
-          --ln: #2c4a43;
-          --bt-a: #f59a3a;
-          --bt-b: #e27e1c;
-          --bx: #1a1208;
-          --ac: #f2a65a;
-          --tx: #f3ecdc;
-          --tx2: #c9d6cf;
-          --mu: #9db3ab;
-          --ic: #f2a65a;
-          --sh: rgba(0, 0, 0, 0.38);
-          --err: #ff8a80;
-          --pat-ring: rgba(242, 166, 90, 0.16);
-          --pat-dot: rgba(242, 166, 90, 0.30);
-        }
-        .soft-luxury-viewport[data-theme="light"] {
-          --bg: #f2f7f4;
-          --card: #ffffff;
-          --soft: #f2f7f4;
-          --ln: #c5dad1;
-          --bt-a: #137a64;
-          --bt-b: #0f5e4d;
+          --bg: #0a0505;
+          --card: #140808;
+          --soft: #1f0c0c;
+          --ln: #361515;
+          --bt-a: #dc2626;
+          --bt-b: #b91c1c;
           --bx: #ffffff;
-          --ac: #e67e22;
-          --tx: #10302a;
-          --tx2: #2f5249;
-          --mu: #5f7f74;
-          --ic: #0f5e4d;
-          --sh: rgba(15, 94, 77, 0.14);
-          --err: #b3261e;
-          --pat-ring: rgba(15, 94, 77, 0.15);
-          --pat-dot: rgba(230, 126, 34, 0.38);
-        }
-        @media (prefers-color-scheme: light) {
-          .soft-luxury-viewport[data-theme="auto"] {
-            --bg: #f2f7f4;
-            --card: #ffffff;
-            --soft: #f2f7f4;
-            --ln: #c5dad1;
-            --bt-a: #137a64;
-            --bt-b: #0f5e4d;
-            --bx: #ffffff;
-            --ac: #e67e22;
-            --tx: #10302a;
-            --tx2: #2f5249;
-            --mu: #5f7f74;
-            --ic: #0f5e4d;
-            --sh: rgba(15, 94, 77, 0.14);
-            --err: #b3261e;
-            --pat-ring: rgba(15, 94, 77, 0.15);
-            --pat-dot: rgba(230, 126, 34, 0.38);
-          }
+          --ac: #f87171;
+          --tx: #fef2f2;
+          --tx2: #fca5a5;
+          --mu: #9ca3af;
+          --ic: #f87171;
+          --sh: rgba(220, 38, 38, 0.15);
+          --err: #fca5a5;
+          --pat-ring: rgba(220, 38, 38, 0.1);
+          --pat-dot: rgba(220, 38, 38, 0.2);
         }
 
         .soft-luxury-viewport {
@@ -628,28 +504,21 @@ END:VCARD`;
           align-items: center;
         }
         .logo-circle-container {
-          width: 135px;
-          height: 135px;
+          width: 130px;
+          height: 130px;
           border-radius: 50%;
-          background-color: transparent;
+          background-color: var(--soft);
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          box-shadow: 0 14px 34px var(--sh), 0 6px 14px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 14px 34px var(--sh), 0 6px 14px rgba(0, 0, 0, 0.3);
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
-          border: 3px solid var(--ac);
-          transition: transform 0.2s ease;
-        }
-        .logo-circle-container:active {
-          transform: scale(0.96);
+          border: 3px solid var(--bt-a);
         }
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .logo-circle-container { animation: none; }
         }
         .brand-main-title {
           font-family: Georgia, serif;
@@ -680,13 +549,13 @@ END:VCARD`;
           background: linear-gradient(90deg, transparent, var(--ln), transparent);
         }
         .divider-gem {
-          color: var(--ac);
+          color: var(--bt-a);
           font-size: 8px;
         }
         .stars-cluster {
           display: flex;
           gap: 4px;
-          color: var(--ac);
+          color: #fbbf24;
           font-size: 16px;
           margin-bottom: 4px;
         }
@@ -785,7 +654,7 @@ END:VCARD`;
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: var(--ac);
+          background: var(--bt-a);
         }
         .top-rewrite-btn {
           display: inline-flex;
@@ -798,14 +667,6 @@ END:VCARD`;
           font-size: 10.5px;
           font-weight: 650;
           cursor: pointer;
-          transition: transform 0.15s ease;
-        }
-        .top-rewrite-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-        .top-rewrite-btn:active {
-          transform: scale(0.95);
         }
         .review-display-zone {
           min-height: 80px;
@@ -855,7 +716,7 @@ END:VCARD`;
         }
         .card-ornament-center {
           text-align: center;
-          color: var(--ac);
+          color: var(--bt-a);
           font-size: 7px;
           margin: 6px 0 10px;
         }
@@ -955,7 +816,7 @@ END:VCARD`;
         .call-disc:hover svg { stroke: #ffffff; }
 
         .contact-disc:hover { background: var(--bt-a); border-color: var(--bt-a); }
-        .contact-disc:hover svg { stroke: var(--bx); }
+        .contact-disc:hover svg { stroke: #ffffff; }
 
         .map-disc:hover { background: #ea4335; border-color: #ea4335; }
         .map-disc:hover svg { stroke: #ffffff; }
@@ -965,9 +826,6 @@ END:VCARD`;
 
         .fb-disc:hover { background: #1877f2; border-color: #1877f2; }
         .fb-disc:hover svg { stroke: #ffffff; }
-
-        .yt-disc:hover { background: #ff0000; border-color: #ff0000; }
-        .yt-disc:hover svg { stroke: #ffffff; color: #ffffff; }
 
         .icon-tag {
           font-size: 9.5px;
@@ -1028,8 +886,6 @@ END:VCARD`;
           line-height: 1.4;
           text-align: center;
         }
-
-        /* ---------- Mini Footer ---------- */
         .mini-footer {
           width: 100%;
           display: flex;
@@ -1056,7 +912,7 @@ END:VCARD`;
           font-weight: 700;
         }
         .mini-footer-dot {
-          color: var(--ac);
+          color: var(--bt-a);
         }
         .mini-footer-pill a {
           color: var(--ac);
