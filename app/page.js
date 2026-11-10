@@ -555,7 +555,8 @@ END:VCARD`;
           --ic: #f2a65a;
           --sh: rgba(0, 0, 0, 0.38);
           --err: #ff8a80;
-          --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%23F2A65A' stroke-opacity='.12'/%3E%3Ccircle cx='0' cy='0' r='1.4' fill='%23F2A65A' fill-opacity='.25'/%3E%3Ccircle cx='32' cy='0' r='1.4' fill='%23F2A65A' fill-opacity='.25'/%3E%3Ccircle cx='0' cy='32' r='1.4' fill='%23F2A65A' fill-opacity='.25'/%3E%3Ccircle cx='32' cy='32' r='1.4' fill='%23F2A65A' fill-opacity='.25'/%3E%3C/svg%3E");
+          --pat-ring: rgba(242, 166, 90, 0.16);
+          --pat-dot: rgba(242, 166, 90, 0.30);
         }
         .soft-luxury-viewport[data-theme="light"] {
           --bg: #f2f7f4;
@@ -572,7 +573,8 @@ END:VCARD`;
           --ic: #0f5e4d;
           --sh: rgba(15, 94, 77, 0.14);
           --err: #b3261e;
-          --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%230F5E4D' stroke-opacity='.13'/%3E%3Ccircle cx='0' cy='0' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3Ccircle cx='32' cy='0' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3Ccircle cx='0' cy='32' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3Ccircle cx='32' cy='32' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3C/svg%3E");
+          --pat-ring: rgba(15, 94, 77, 0.15);
+          --pat-dot: rgba(230, 126, 34, 0.38);
         }
         @media (prefers-color-scheme: light) {
           .soft-luxury-viewport[data-theme="auto"] {
@@ -590,14 +592,18 @@ END:VCARD`;
             --ic: #0f5e4d;
             --sh: rgba(15, 94, 77, 0.14);
             --err: #b3261e;
-            --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%230F5E4D' stroke-opacity='.13'/%3E%3Ccircle cx='0' cy='0' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3Ccircle cx='32' cy='0' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3Ccircle cx='0' cy='32' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3Ccircle cx='32' cy='32' r='1.4' fill='%23E67E22' fill-opacity='.35'/%3E%3C/svg%3E");
+            --pat-ring: rgba(15, 94, 77, 0.15);
+            --pat-dot: rgba(230, 126, 34, 0.38);
           }
         }
 
         .soft-luxury-viewport {
           min-height: 100vh;
           background-color: var(--bg);
-          background-image: var(--pat);
+          background-image:
+            radial-gradient(circle at 16px 16px, var(--pat-dot) 1.5px, transparent 2px),
+            radial-gradient(circle at 16px 16px, transparent 5px, var(--pat-ring) 5.5px, var(--pat-ring) 6.4px, transparent 6.9px);
+          background-size: 32px 32px;
           padding: 14px 16px 24px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
