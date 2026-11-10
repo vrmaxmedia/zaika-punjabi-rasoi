@@ -237,7 +237,7 @@ END:VCARD`;
     URL.revokeObjectURL(url);
   }
 
-  if (!mounted) return <div style={{ minHeight: "100vh", backgroundColor: "#0a0505" }} />;
+  if (!mounted) return <div style={{ minHeight: "100vh", backgroundColor: "#991b1b" }} />;
 
   return (
     <main className="soft-luxury-viewport">
@@ -453,24 +453,24 @@ END:VCARD`;
       </div>
 
       <style jsx global>{`
-        /* ===== THEME: Rich Red & Dark Luxury ===== */
+        /* ===== THEME: Vibrant Pure Red Background + Dark Luxury Cards ===== */
         .soft-luxury-viewport {
-          --bg: #0a0505;
-          --card: #140808;
-          --soft: #1f0c0c;
-          --ln: #361515;
-          --bt-a: #dc2626;
-          --bt-b: #b91c1c;
+          --bg: #991b1b;
+          --card: #1c0909;
+          --soft: #2c0f0f;
+          --ln: #4c1d1d;
+          --bt-a: #ef4444;
+          --bt-b: #dc2626;
           --bx: #ffffff;
-          --ac: #f87171;
+          --ac: #fca5a5;
           --tx: #fef2f2;
-          --tx2: #fca5a5;
-          --mu: #9ca3af;
-          --ic: #f87171;
-          --sh: rgba(220, 38, 38, 0.15);
+          --tx2: #fecaca;
+          --mu: #f38181;
+          --ic: #fca5a5;
+          --sh: rgba(0, 0, 0, 0.4);
           --err: #fca5a5;
-          --pat-ring: rgba(220, 38, 38, 0.1);
-          --pat-dot: rgba(220, 38, 38, 0.2);
+          --pat-ring: rgba(255, 255, 255, 0.08);
+          --pat-dot: rgba(255, 255, 255, 0.15);
         }
 
         .soft-luxury-viewport {
@@ -514,7 +514,7 @@ END:VCARD`;
           box-shadow: 0 14px 34px var(--sh), 0 6px 14px rgba(0, 0, 0, 0.3);
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
-          border: 3px solid var(--bt-a);
+          border: 3px solid #ffffff;
         }
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
@@ -527,12 +527,13 @@ END:VCARD`;
           color: var(--tx);
           margin: 0 0 4px;
           letter-spacing: 0.3px;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         .brand-serif-subtitle {
           font-family: Georgia, serif;
           font-style: italic;
           font-size: 13.5px;
-          color: var(--ac);
+          color: var(--tx2);
           margin: 0 0 10px;
         }
         .royal-shahi-divider {
@@ -546,24 +547,25 @@ END:VCARD`;
         .divider-line {
           flex: 1;
           height: 1px;
-          background: linear-gradient(90deg, transparent, var(--ln), transparent);
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
         }
         .divider-gem {
-          color: var(--bt-a);
+          color: #ffffff;
           font-size: 8px;
         }
         .stars-cluster {
           display: flex;
           gap: 4px;
-          color: #fbbf24;
+          color: #fde047;
           font-size: 16px;
           margin-bottom: 4px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         .experience-tracker-title {
-          font-size: 9px;
+          font-size: 9.5px;
           font-weight: 800;
           letter-spacing: 2px;
-          color: var(--mu);
+          color: #fecaca;
           text-transform: uppercase;
           margin: 0 0 12px;
         }
@@ -590,11 +592,11 @@ END:VCARD`;
           transform: scale(0.95);
         }
         .embossed-pill.active {
-          background: linear-gradient(180deg, var(--bt-a) 0%, var(--bt-b) 100%);
-          color: var(--bx);
-          font-weight: 700;
-          border-color: var(--bt-b);
-          box-shadow: 0 4px 14px var(--sh);
+          background: #ffffff;
+          color: #991b1b;
+          font-weight: 800;
+          border-color: #ffffff;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.3);
         }
         .capsule-lang-dock {
           display: inline-flex;
@@ -617,9 +619,10 @@ END:VCARD`;
           cursor: pointer;
         }
         .capsule-lang-btn.active {
-          background: linear-gradient(180deg, var(--bt-a) 0%, var(--bt-b) 100%);
-          color: var(--bx);
-          box-shadow: 0 3px 8px var(--sh);
+          background: #ffffff;
+          color: #991b1b;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+          font-weight: 800;
         }
         .signature-review-box {
           width: 100%;
@@ -631,7 +634,7 @@ END:VCARD`;
           box-shadow: 0 14px 34px var(--sh);
           margin-bottom: 16px;
           text-align: left;
-          border-top: 4px solid var(--bt-a);
+          border-top: 4px solid #ffffff;
           color: var(--tx);
         }
         .box-top-ribbon {
@@ -654,7 +657,7 @@ END:VCARD`;
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: var(--bt-a);
+          background: #ef4444;
         }
         .top-rewrite-btn {
           display: inline-flex;
@@ -716,7 +719,7 @@ END:VCARD`;
         }
         .card-ornament-center {
           text-align: center;
-          color: var(--bt-a);
+          color: #ef4444;
           font-size: 7px;
           margin: 6px 0 10px;
         }
@@ -724,13 +727,13 @@ END:VCARD`;
           width: 100%;
           height: 50px;
           border-radius: 999px;
-          background: linear-gradient(180deg, var(--bt-a) 0%, var(--bt-b) 100%);
+          background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
           border: none;
-          color: var(--bx);
+          color: #991b1b;
           font-size: 12.5px;
           font-weight: 800;
           cursor: pointer;
-          box-shadow: 0 8px 22px var(--sh);
+          box-shadow: 0 8px 22px rgba(0,0,0,0.3);
           transition: transform 0.15s ease;
         }
         .full-luxury-copy-btn:disabled {
@@ -815,7 +818,7 @@ END:VCARD`;
         .call-disc:hover { background: #007aff; border-color: #007aff; }
         .call-disc:hover svg { stroke: #ffffff; }
 
-        .contact-disc:hover { background: var(--bt-a); border-color: var(--bt-a); }
+        .contact-disc:hover { background: #ef4444; border-color: #ef4444; }
         .contact-disc:hover svg { stroke: #ffffff; }
 
         .map-disc:hover { background: #ea4335; border-color: #ea4335; }
@@ -908,14 +911,14 @@ END:VCARD`;
           line-height: 1.4;
         }
         .mini-footer-pill strong {
-          color: var(--ac);
+          color: #fca5a5;
           font-weight: 700;
         }
         .mini-footer-dot {
-          color: var(--bt-a);
+          color: #ef4444;
         }
         .mini-footer-pill a {
-          color: var(--ac);
+          color: #fca5a5;
           font-weight: 700;
           text-decoration: none;
         }
