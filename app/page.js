@@ -538,7 +538,14 @@ END:VCARD`;
       <style jsx global>{`
         .soft-luxury-viewport {
           min-height: 100vh;
-          background: #fbf9f4;
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+          background:
+            radial-gradient(ellipse at 8% 8%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 38%),
+            radial-gradient(ellipse at 92% 24%, rgba(232, 211, 177, 0.30) 0%, rgba(232, 211, 177, 0) 42%),
+            radial-gradient(ellipse at 12% 82%, rgba(225, 204, 174, 0.24) 0%, rgba(225, 204, 174, 0) 43%),
+            linear-gradient(135deg, #fffdf8 0%, #f8f2e8 48%, #fffaf1 100%);
           padding: 14px 16px 24px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -547,7 +554,47 @@ END:VCARD`;
           flex-direction: column;
           align-items: center;
         }
+        /* Luxury Champagne Flow background layers */
+        .soft-luxury-viewport::before,
+        .soft-luxury-viewport::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .soft-luxury-viewport::before {
+          opacity: 0.72;
+          background-image:
+            repeating-radial-gradient(
+              ellipse 78% 46% at 108% 8%,
+              transparent 0 27px,
+              rgba(183, 138, 72, 0.13) 28px 29px,
+              transparent 30px 48px
+            ),
+            repeating-radial-gradient(
+              ellipse 72% 42% at -12% 88%,
+              transparent 0 32px,
+              rgba(183, 138, 72, 0.10) 33px 34px,
+              transparent 35px 56px
+            );
+          mask-image: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.82),
+            rgba(0, 0, 0, 0.18) 52%,
+            rgba(0, 0, 0, 0.72)
+          );
+        }
+        .soft-luxury-viewport::after {
+          opacity: 0.8;
+          background:
+            radial-gradient(ellipse at 92% 12%, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0) 24%),
+            radial-gradient(ellipse at 4% 72%, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 28%),
+            linear-gradient(118deg, transparent 0 38%, rgba(255, 255, 255, 0.20) 48%, transparent 58%);
+        }
         .main-content-flow {
+          position: relative;
+          z-index: 1;
           width: 100%;
           max-width: 410px;
           display: flex;
