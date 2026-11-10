@@ -1,50 +1,43 @@
-'use client';
+```javascript
+"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
-// =====================================================================
-//  CLIENT CONFIGURATION (Zaika Punjabi Rasoi - Yamuna Vihar)
-// =====================================================================
 const CLIENT_CONFIG = {
+  clientId: "zaika_punjabi_rasoi_01",
   businessName: "Zaika Punjabi Rasoi",
   subHeading: "Punjabi Restaurant in Yamuna Vihar, Delhi",
   tagline: "AUTHENTIC PUNJABI FOOD • HYGIENIC DINING • FAMILY RESTAURANT",
   description:
     "Popular Punjabi restaurant in Yamuna Vihar, Delhi, rated 4.7 on Google by 500+ diners. Serving delicious North Indian dishes, fresh breads, starters, and mouth-watering meals.",
   city: "Yamuna Vihar, Delhi 110053",
-  areaLabel: "Yamuna Vihar, Delhi",
   fullAddress: "Ground Floor, C-2/341, near Punjabi Rasoi, Block C, Yamuna Vihar, Delhi, 110053",
   phone: "+919311060505",
   cleanPhone: "919311060505",
   logoUrl: "/logo.png",
-
   googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJQ7FvGR39DDkR_cX-F2Y0OfA",
-  mapsDirectionUrl:
-    "https://www.google.com/maps/search/?api=1&query=" +
-    encodeURIComponent("Zaika Punjabi Rasoi, C-2/341, Block C, Yamuna Vihar, Delhi 110053"),
-
+  mapsDirectionUrl: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Zaika Punjabi Rasoi, C-2/341, Block C, Yamuna Vihar, Delhi 110053"),
   instagramUrl: "",
   facebookUrl: "",
   youtubeUrl: "",
-
+  whatsappChannelUrl: "",
   agencyName: "VR Max AI",
   agencyWhatsapp: "918700660097",
   agencyPhoneDisplay: "+91 87006 60097",
-
-  // Root file ke chips ke sath exact matching list
+  customInstruction:
+    "You are an authentic local customer writing an unscripted Google Maps review for Zaika Punjabi Rasoi in Yamuna Vihar, Delhi. Write like a real human speaking straight from the heart. Mention random specific dishes organically. Strictly DO NOT use full stops (.) at the end of sentences. Vary lengths completely randomly (some 1-line quick reviews, some 2-line, some 3-4 lines detailed). Never use robotic or repetitive openings.",
   chips: [
-    'Best Taste',
-    'Pocket Friendly',
-    'Family Friendly',
-    'Fresh & Hot',
-    'Clean Ambience',
-    'Fast Service',
-    'Yamuna Vihar',
-    'Good Quantity',
+    { label: "All", context: "overall restaurant experience" },
+    { label: "Best Taste", context: "amazing and authentic food taste" },
+    { label: "Pocket Friendly", context: "pocket friendly and budget pricing" },
+    { label: "Family Friendly", context: "great family restaurant with a comfortable vibe" },
+    { label: "Fresh & Hot", context: "food served fresh and piping hot" },
+    { label: "Clean Ambience", context: "clean, hygienic, and well maintained place" },
+    { label: "Fast Service", context: "quick service and attentive staff" },
+    { label: "Yamuna Vihar", context: "easy to reach location in Yamuna Vihar" },
+    { label: "Good Quantity", context: "satisfying portion size and quantity" }
   ],
 };
-
-const HAS_SOCIAL = !!(CLIENT_CONFIG.instagramUrl || CLIENT_CONFIG.facebookUrl || CLIENT_CONFIG.youtubeUrl);
 
 const MAP_EMBED_URL = `https://www.google.com/maps?q=${encodeURIComponent(
   `${CLIENT_CONFIG.businessName}, ${CLIENT_CONFIG.fullAddress}`
@@ -54,7 +47,7 @@ const AGENCY_WA_LINK = `https://wa.me/${CLIENT_CONFIG.agencyWhatsapp}?text=${enc
   "Hi VR Max AI, I want to get a QR review system for my business."
 )}`;
 
-function useTypewriter(fullText, speed = 10) {
+function useTypewriter(fullText, totalMs = 2300) {
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -64,19 +57,47 @@ function useTypewriter(fullText, speed = 10) {
       setIsTyping(false);
       return;
     }
+
     setDisplayText("");
     setIsTyping(true);
-    let index = 0;
-    const timer = setInterval(() => {
-      index++;
-      setDisplayText(fullText.slice(0, index));
-      if (index >= fullText.length) {
-        clearInterval(timer);
+
+    const COMMA_PAUSE = 90;
+    const commas = (fullText.match(/,/g) || []).length;
+    const base = Math.min(
+      26,
+      Math.max(10, (totalMs - commas * COMMA_PAUSE) / fullText.length)
+    );
+
+    const times = [];
+    let t = 0;
+
+    for (let i = 0; i < fullText.length; i++) {
+      t += base;
+      times.push(t);
+      if (fullText[i] === ",") t += COMMA_PAUSE;
+    }
+
+    const start = performance.now();
+    let raf;
+
+    const tick = (now) => {
+      const elapsed = now - start;
+      let n = 0;
+
+      while (n < times.length && times[n] <= elapsed) n++;
+
+      setDisplayText(fullText.slice(0, n));
+
+      if (n >= fullText.length) {
         setIsTyping(false);
+      } else {
+        raf = requestAnimationFrame(tick);
       }
-    }, speed);
-    return () => clearInterval(timer);
-  }, [fullText, speed]);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [fullText, totalMs]);
 
   return { displayText, isTyping };
 }
@@ -87,7 +108,10 @@ async function copyToClipboard(text) {
       await navigator.clipboard.writeText(text);
       return true;
     }
-  } catch (e) {}
+  } catch (e) {
+    // Fallback below
+  }
+
   try {
     const ta = document.createElement("textarea");
     ta.value = text;
@@ -96,6 +120,7 @@ async function copyToClipboard(text) {
     ta.style.opacity = "0";
     document.body.appendChild(ta);
     ta.select();
+    ta.setSelectionRange(0, text.length);
     const ok = document.execCommand("copy");
     ta.remove();
     return ok;
@@ -104,10 +129,11 @@ async function copyToClipboard(text) {
   }
 }
 
-export default function RestaurantReviewPage() {
+export default function UniversalReviewPage() {
   const [mounted, setMounted] = useState(false);
-  const [selectedChips, setSelectedChips] = useState([]);
-  const [language, setLanguage] = useState("HINGLISH");
+  const [selectedLabels, setSelectedLabels] = useState(["All"]);
+  const firstRunRef = useRef(true);
+  const [language, setLanguage] = useState("ENGLISH");
   const [reviewDraft, setReviewDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -116,18 +142,20 @@ export default function RestaurantReviewPage() {
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
   const recentLengthsRef = useRef([]);
-  const { displayText, isTyping } = useTypewriter(reviewDraft, 10);
+  const { displayText, isTyping } = useTypewriter(reviewDraft);
 
   useEffect(() => {
     setMounted(true);
+
     return () => {
       requestIdRef.current++;
       abortControllerRef.current?.abort();
     };
   }, []);
 
-  const generateAIReview = useCallback(async (chipsToUse, lang) => {
+  const generateAIReview = useCallback(async (labels, lang) => {
     abortControllerRef.current?.abort();
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const requestId = ++requestIdRef.current;
@@ -138,6 +166,8 @@ export default function RestaurantReviewPage() {
     setReviewDraft("");
 
     try {
+      const effectiveFocus = labels.join(" + ");
+
       const res = await fetch("/api/reviews", {
         method: "POST",
         signal: controller.signal,
@@ -148,69 +178,113 @@ export default function RestaurantReviewPage() {
           category: CLIENT_CONFIG.tagline,
           description: CLIENT_CONFIG.description,
           city: CLIENT_CONFIG.city,
-          selectedChips: chipsToUse,
+          selectedService: effectiveFocus,
+          selectedChips: labels,
+          customInstruction: CLIENT_CONFIG.customInstruction,
           language: lang,
           nonce: Math.random().toString(36).substring(2, 12),
           timestamp: Date.now(),
+          randomSeed: Math.floor(Math.random() * 100000),
           recentLengths: recentLengthsRef.current,
         }),
       });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || `Draft generation failed (${res.status}).`);
-      if (!data.review?.trim()) throw new Error("The API returned an empty draft.");
+
+      if (!res.ok) {
+        throw new Error(data.error || `Draft generation failed (${res.status}).`);
+      }
+
+      if (!data.review?.trim()) {
+        throw new Error("The API returned an empty draft.");
+      }
+
       if (requestId !== requestIdRef.current) return;
 
       if (data.meta) {
-        recentLengthsRef.current = [...recentLengthsRef.current, data.meta].slice(-6);
+        recentLengthsRef.current = [
+          ...recentLengthsRef.current,
+          data.meta,
+        ].slice(-6);
       }
+
       setReviewDraft(data.review.trim());
     } catch (err) {
       if (err.name === "AbortError") return;
+
       if (requestId === requestIdRef.current) {
         setError(err.message || "Unable to generate a draft.");
       }
     } finally {
-      if (requestId === requestIdRef.current) setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
-    generateAIReview(selectedChips, language);
-    return () => abortControllerRef.current?.abort();
-  }, [mounted, selectedChips, language, generateAIReview]);
 
-  function toggleChip(chip) {
-    let updated;
-    if (selectedChips.includes(chip)) {
-      updated = selectedChips.filter((c) => c !== chip);
-    } else {
-      if (selectedChips.length >= 3) {
-        alert("Aap max 3 chips select kar sakte hain.");
-        return;
+    const delay = firstRunRef.current ? 0 : 350;
+    firstRunRef.current = false;
+
+    const t = setTimeout(
+      () => generateAIReview(selectedLabels, language),
+      delay
+    );
+
+    return () => {
+      clearTimeout(t);
+      abortControllerRef.current?.abort();
+    };
+  }, [mounted, selectedLabels, language, generateAIReview]);
+
+  function handleChipChange(chipObj) {
+    if (chipObj.label === "All") {
+      if (
+        selectedLabels.length === 1 &&
+        selectedLabels[0] === "All"
+      ) {
+        generateAIReview(["All"], language);
+      } else {
+        setSelectedLabels(["All"]);
       }
-      updated = [...selectedChips, chip];
+      return;
     }
-    setSelectedChips(updated);
+
+    let next = selectedLabels.filter((l) => l !== "All");
+
+    if (next.includes(chipObj.label)) {
+      next = next.filter((l) => l !== chipObj.label);
+    } else {
+      next = [...next, chipObj.label];
+      if (next.length > 3) next = next.slice(-3);
+    }
+
+    setSelectedLabels(next.length ? next : ["All"]);
   }
 
   function handleLanguageChange(lang) {
     if (lang === language) {
-      generateAIReview(selectedChips, lang);
+      generateAIReview(selectedLabels, lang);
       return;
     }
+
     setLanguage(lang);
   }
 
   async function handleCopyAndRedirect() {
     if (!reviewDraft || loading || isTyping) return;
+
     const ok = await copyToClipboard(reviewDraft);
+
     if (!ok) {
       setError("Could not copy the draft. Please select and copy it manually.");
       return;
     }
+
     setCopied(true);
+
     setTimeout(() => {
       window.location.href = CLIENT_CONFIG.googleReviewUrl;
     }, 550);
@@ -226,18 +300,32 @@ ADR;TYPE=WORK:;;${CLIENT_CONFIG.fullAddress};;;;
 NOTE:${CLIENT_CONFIG.subHeading}
 END:VCARD`;
 
-    const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8;" });
+    const blob = new Blob([vcard], {
+      type: "text/vcard;charset=utf-8;",
+    });
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+
     link.href = url;
     link.download = `${CLIENT_CONFIG.businessName.replace(/\s+/g, "_")}.vcf`;
+
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
   }
 
-  if (!mounted) return <div style={{ minHeight: "100vh", backgroundColor: "#991b1b" }} />;
+  if (!mounted) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#b91c1c",
+        }}
+      />
+    );
+  }
 
   return (
     <main className="soft-luxury-viewport">
@@ -246,14 +334,21 @@ END:VCARD`;
         <div className="brand-medallion-badge">
           <div
             className="logo-circle-container"
-            style={{ backgroundImage: `url(${CLIENT_CONFIG.logoUrl})` }}
+            style={{
+              backgroundImage: `url(${CLIENT_CONFIG.logoUrl})`,
+            }}
             role="img"
             aria-label={`${CLIENT_CONFIG.businessName} logo`}
           ></div>
-          <h1 className="brand-main-title">{CLIENT_CONFIG.businessName}</h1>
+
+          <h1 className="brand-main-title">
+            {CLIENT_CONFIG.businessName}
+          </h1>
         </div>
 
-        <p className="brand-serif-subtitle">{CLIENT_CONFIG.subHeading}</p>
+        <p className="brand-serif-subtitle">
+          {CLIENT_CONFIG.subHeading}
+        </p>
 
         <div className="royal-shahi-divider">
           <span className="divider-line"></span>
@@ -262,32 +357,44 @@ END:VCARD`;
         </div>
 
         <div className="stars-cluster" aria-hidden="true">
-          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
         </div>
 
-        <p className="experience-tracker-title">SHARE YOUR EXPERIENCE</p>
+        <p className="experience-tracker-title">
+          SHARE YOUR EXPERIENCE
+        </p>
 
         {/* Filter Chips */}
         <div className="floating-pills-cloud">
           {CLIENT_CONFIG.chips.map((chip) => {
-            const active = selectedChips.includes(chip);
+            const active = selectedLabels.includes(chip.label);
+
             return (
               <button
-                key={chip}
+                key={chip.label}
                 type="button"
-                onClick={() => toggleChip(chip)}
+                onClick={() => handleChipChange(chip)}
                 className={`embossed-pill ${active ? "active" : ""}`}
               >
-                {chip} {active && "✓"}
+                {chip.label}
               </button>
             );
           })}
         </div>
 
+        <p className="chip-hint">
+          Tap up to 3 keywords for your review
+        </p>
+
         {/* Language Selector */}
         <div className="capsule-lang-dock">
           {["ENGLISH", "HINGLISH"].map((lang) => {
             const active = language === lang;
+
             return (
               <button
                 key={lang}
@@ -308,10 +415,11 @@ END:VCARD`;
               <span className="dot-ping"></span>
               YOUR REVIEW
             </div>
+
             <button
               type="button"
               disabled={loading || isTyping}
-              onClick={() => generateAIReview(selectedChips, language)}
+              onClick={() => generateAIReview(selectedLabels, language)}
               className="top-rewrite-btn"
             >
               <span>Rewrite</span>
@@ -322,31 +430,46 @@ END:VCARD`;
             {loading ? (
               <div className="loader-shimmer-wrap">
                 <span className="sparkle-icon">✦</span>
-                <span className="shimmer-text"> Crafting authentic review...</span>
+                <span className="shimmer-text">
+                  Crafting authentic review...
+                </span>
               </div>
             ) : error ? (
               <p className="review-error">{error}</p>
             ) : reviewDraft ? (
               <p className="review-body-text">
                 {displayText}
-                {isTyping && <span className="typewriter-cursor"></span>}
+                {isTyping && (
+                  <span className="typewriter-cursor"></span>
+                )}
               </p>
             ) : (
-              <p className="review-placeholder">Your review draft will appear here.</p>
+              <p className="review-placeholder">
+                Your review draft will appear here.
+              </p>
             )}
           </div>
 
-          <div className="card-ornament-center"><span>◆</span></div>
+          <div className="card-ornament-center">
+            <span>◆</span>
+          </div>
 
           <button
             type="button"
             disabled={loading || isTyping || !reviewDraft}
             onClick={handleCopyAndRedirect}
-            className="full-luxury-copy-btn"
+            className={`full-luxury-copy-btn ${copied ? "copied" : ""}`}
           >
-            <span>{copied ? "Copied! Opening Google..." : "Copy & Paste on Google"}</span>
+            <span>
+              {copied
+                ? "Copied! Opening Google..."
+                : "Copy & Paste on Google"}
+            </span>
           </button>
-          <p className="card-disclaimer-note">Please review the wording before posting.</p>
+
+          <p className="card-disclaimer-note">
+            Please review the wording before posting.
+          </p>
         </div>
 
         {/* Quick Actions */}
@@ -354,9 +477,16 @@ END:VCARD`;
           <div className="soft-action-grid">
             <div className="action-row-upper">
               {/* WhatsApp */}
-              <a href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc whatsapp-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
                 </div>
                 <span className="icon-tag">WhatsApp</span>
               </a>
@@ -364,43 +494,116 @@ END:VCARD`;
               {/* Call Us */}
               <a href={`tel:${CLIENT_CONFIG.phone}`} className="soft-circle-action">
                 <div className="icon-disc call-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Call Us</span>
               </a>
 
               {/* Save Contact */}
-              <button type="button" onClick={handleSaveContact} className="soft-circle-action">
+              <button
+                type="button"
+                onClick={handleSaveContact}
+                className="soft-circle-action"
+              >
                 <div className="icon-disc contact-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Save Contact</span>
               </button>
 
               {/* Directions */}
-              <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={CLIENT_CONFIG.mapsDirectionUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc map-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Directions</span>
               </a>
             </div>
 
-            <div className="action-row-lower" style={HAS_SOCIAL ? undefined : { display: "none" }}>
+            <div className="action-row-lower" style={(!CLIENT_CONFIG.instagramUrl && !CLIENT_CONFIG.facebookUrl && !CLIENT_CONFIG.youtubeUrl && !CLIENT_CONFIG.whatsappChannelUrl) ? { display: "none" } : undefined}>
+              {/* Instagram */}
               {CLIENT_CONFIG.instagramUrl && (
-                <a href={CLIENT_CONFIG.instagramUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <a
+                  href={CLIENT_CONFIG.instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="soft-circle-action"
+                >
                   <div className="icon-disc insta-disc">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                    </svg>
                   </div>
                   <span className="icon-tag">Instagram</span>
                 </a>
               )}
+
+              {/* WhatsApp Channel */}
+              {CLIENT_CONFIG.whatsappChannelUrl && (
+                <a
+                  href={CLIENT_CONFIG.whatsappChannelUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="soft-circle-action"
+                >
+                  <div className="icon-disc wa-channel-disc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                  </div>
+                  <span className="icon-tag">WA Channel</span>
+                </a>
+              )}
+
+              {/* Facebook */}
               {CLIENT_CONFIG.facebookUrl && (
-                <a href={CLIENT_CONFIG.facebookUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <a
+                  href={CLIENT_CONFIG.facebookUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="soft-circle-action"
+                >
                   <div className="icon-disc fb-disc">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                    </svg>
                   </div>
                   <span className="icon-tag">Facebook</span>
+                </a>
+              )}
+
+              {/* YouTube */}
+              {CLIENT_CONFIG.youtubeUrl && (
+                <a
+                  href={CLIENT_CONFIG.youtubeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="soft-circle-action"
+                >
+                  <div className="icon-disc yt-disc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+                      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" />
+                    </svg>
+                  </div>
+                  <span className="icon-tag">YouTube</span>
                 </a>
               )}
             </div>
@@ -409,17 +612,26 @@ END:VCARD`;
 
         {/* Map Card */}
         <div className="embedded-map-card">
-          <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="map-card-header-link">
+          <a
+            href={CLIENT_CONFIG.mapsDirectionUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="map-card-header-link"
+          >
             <div className="address-highlight-box">
-              <p className="agency-clean-address"><strong>📍 Address:</strong> {CLIENT_CONFIG.fullAddress}</p>
+              <p className="agency-clean-address">
+                <strong>📍 Address:</strong> {CLIENT_CONFIG.fullAddress}
+              </p>
             </div>
+
             <div className="map-card-header">
-              <span>Visit Us • {CLIENT_CONFIG.areaLabel}</span>
+              <span>Visit Store • Yamuna Vihar, Delhi</span>
             </div>
           </a>
+
           <div className="map-iframe-container">
             <iframe
-              title={`${CLIENT_CONFIG.businessName} Location`}
+              title="Zaika Punjabi Rasoi Location"
               src={MAP_EMBED_URL}
               width="100%"
               height="170"
@@ -429,6 +641,7 @@ END:VCARD`;
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
+
           <a
             href={CLIENT_CONFIG.mapsDirectionUrl}
             target="_blank"
@@ -453,41 +666,23 @@ END:VCARD`;
       </div>
 
       <style jsx global>{`
-        /* ===== THEME: Vibrant Pure Red Background + Dark Luxury Cards ===== */
-        .soft-luxury-viewport {
-          --bg: #991b1b;
-          --card: #1c0909;
-          --soft: #2c0f0f;
-          --ln: #4c1d1d;
-          --bt-a: #ef4444;
-          --bt-b: #dc2626;
-          --bx: #ffffff;
-          --ac: #fca5a5;
-          --tx: #fef2f2;
-          --tx2: #fecaca;
-          --mu: #f38181;
-          --ic: #fca5a5;
-          --sh: rgba(0, 0, 0, 0.4);
-          --err: #fca5a5;
-          --pat-ring: rgba(255, 255, 255, 0.08);
-          --pat-dot: rgba(255, 255, 255, 0.15);
-        }
+        /* =========================================
+           SOFT LUXURY COLOR SYSTEM
+           Pure Red Theme with Dark Cards
+           ========================================= */
 
         .soft-luxury-viewport {
           min-height: 100vh;
-          background-color: var(--bg);
-          background-image:
-            radial-gradient(circle at 16px 16px, var(--pat-dot) 1.5px, transparent 2px),
-            radial-gradient(circle at 16px 16px, transparent 5px, var(--pat-ring) 5.5px, var(--pat-ring) 6.4px, transparent 6.9px);
-          background-size: 32px 32px;
-          padding: 14px 16px 24px;
+          background: #b91c1c; /* Pure Red Background */
+          padding: 10px 16px 24px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-          color: var(--tx);
+          color: #ffffff;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
+
         .main-content-flow {
           width: 100%;
           max-width: 410px;
@@ -496,118 +691,163 @@ END:VCARD`;
           align-items: center;
           text-align: center;
         }
+
         .brand-medallion-badge {
-          margin-top: 12px;
-          margin-bottom: 6px;
+          margin-top: 2px;
+          margin-bottom: 2px;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
+
         .logo-circle-container {
-          width: 130px;
-          height: 130px;
+          width: 98px;
+          height: 98px;
           border-radius: 50%;
-          background-color: var(--soft);
+          background-color: transparent;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          box-shadow: 0 14px 34px var(--sh), 0 6px 14px rgba(0, 0, 0, 0.3);
-          margin-bottom: 12px;
+          box-shadow:
+            0 10px 25px rgba(0, 0, 0, 0.3),
+            0 3px 9px rgba(0, 0, 0, 0.2);
+          margin-bottom: 8px;
           animation: floatLogo 3.5s ease-in-out infinite;
           border: 3px solid #ffffff;
+          transition: transform 0.2s ease;
         }
+
+        .logo-circle-container:active {
+          transform: scale(0.96);
+        }
+
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+          .logo-circle-container { animation: none; }
+        }
+
         .brand-main-title {
           font-family: Georgia, serif;
-          font-size: 26px;
+          font-size: 23px;
           font-weight: 800;
-          color: var(--tx);
+          color: #ffffff;
           margin: 0 0 4px;
           letter-spacing: 0.3px;
-          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
+
         .brand-serif-subtitle {
           font-family: Georgia, serif;
           font-style: italic;
-          font-size: 13.5px;
-          color: var(--tx2);
-          margin: 0 0 10px;
+          font-size: 12.5px;
+          color: #fecaca;
+          margin: 0 0 4px;
         }
+
         .royal-shahi-divider {
           display: flex;
           align-items: center;
           justify-content: center;
           width: 85%;
-          margin: 8px auto 12px;
+          margin: 4px auto 8px;
           gap: 10px;
         }
+
         .divider-line {
           flex: 1;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+          );
         }
+
         .divider-gem {
           color: #ffffff;
           font-size: 8px;
         }
+
         .stars-cluster {
           display: flex;
           gap: 4px;
           color: #fde047;
-          font-size: 16px;
-          margin-bottom: 4px;
-          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+          font-size: 14px;
+          margin-bottom: 2px;
         }
+
+        .chip-hint {
+          text-align: center;
+          font-size: 11px;
+          color: #fecaca;
+          margin: 0 0 8px;
+          letter-spacing: 0.3px;
+        }
+
         .experience-tracker-title {
-          font-size: 9.5px;
+          font-size: 9px;
           font-weight: 800;
           letter-spacing: 2px;
-          color: #fecaca;
+          color: #ffffff;
           text-transform: uppercase;
-          margin: 0 0 12px;
+          margin: 0 0 8px;
         }
+
         .floating-pills-cloud {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
-          gap: 6px;
-          margin-bottom: 14px;
+          gap: 5px;
+          margin: 0 auto 8px;
           width: 100%;
         }
+
+        /* Dark maroon chips */
         .embossed-pill {
           border-radius: 999px;
-          padding: 6px 14px;
-          font-size: 11px;
-          background: var(--card);
-          color: var(--tx);
-          border: 1px solid var(--ln);
+          padding: 5px 11px;
+          font-size: 11.5px;
+          background: #7f1d1d;
+          color: #fecaca;
+          border: 1px solid #991b1b;
           cursor: pointer;
-          box-shadow: 0 2px 8px var(--sh);
-          transition: all 0.16s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+          transition:
+            background 0.18s ease,
+            color 0.18s ease,
+            border-color 0.18s ease,
+            box-shadow 0.18s ease,
+            transform 0.16s ease;
         }
+
         .embossed-pill:active {
-          transform: scale(0.95);
+          transform: scale(0.97);
         }
+
+        /* White selected chip */
         .embossed-pill.active {
           background: #ffffff;
-          color: #991b1b;
-          font-weight: 800;
+          color: #b91c1c;
           border-color: #ffffff;
-          box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+          font-weight: bold;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
+
         .capsule-lang-dock {
           display: inline-flex;
-          background: var(--card);
+          background: #7f1d1d;
           border-radius: 999px;
           padding: 3px;
           gap: 2px;
-          margin-bottom: 16px;
-          box-shadow: 0 3px 10px var(--sh);
-          border: 1px solid var(--ln);
+          margin: 0 auto 12px;
+          box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
+          border: 1px solid #991b1b;
         }
+
         .capsule-lang-btn {
           padding: 5px 18px;
           border-radius: 999px;
@@ -615,34 +855,37 @@ END:VCARD`;
           background: transparent;
           font-size: 10px;
           font-weight: 700;
-          color: var(--mu);
+          color: #fecaca;
           cursor: pointer;
         }
+
+        /* White selected language */
         .capsule-lang-btn.active {
           background: #ffffff;
-          color: #991b1b;
-          box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-          font-weight: 800;
+          color: #b91c1c;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
+
         .signature-review-box {
           width: 100%;
-          background: var(--card);
+          background: #7f1d1d;
           border-radius: 24px;
           padding: 18px;
           box-sizing: border-box;
-          border: 1px solid var(--ln);
-          box-shadow: 0 14px 34px var(--sh);
+          box-shadow: 0 9px 24px rgba(0, 0, 0, 0.25);
           margin-bottom: 16px;
           text-align: left;
           border-top: 4px solid #ffffff;
-          color: var(--tx);
+          color: #ffffff;
         }
+
         .box-top-ribbon {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 10px;
         }
+
         .label-badge {
           display: inline-flex;
           align-items: center;
@@ -650,116 +893,141 @@ END:VCARD`;
           font-size: 8.5px;
           font-weight: 800;
           letter-spacing: 1.8px;
-          color: var(--mu);
+          color: #fecaca;
           text-transform: uppercase;
         }
+
         .dot-ping {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #ef4444;
+          background: #ffffff;
         }
+
         .top-rewrite-btn {
           display: inline-flex;
           align-items: center;
           padding: 4px 10px;
           border-radius: 999px;
-          background: var(--soft);
-          border: 1px solid var(--ln);
-          color: var(--ac);
+          background: #991b1b;
+          border: 1px solid #b91c1c;
+          color: #ffffff;
           font-size: 10.5px;
           font-weight: 650;
           cursor: pointer;
+          transition: transform 0.15s ease;
         }
+
+        .top-rewrite-btn:active {
+          transform: scale(0.95);
+        }
+
         .review-display-zone {
-          min-height: 80px;
+          min-height: 132px;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 4px 2px 8px;
         }
+
         .loader-shimmer-wrap {
-          color: var(--ac);
+          color: #fca5a5;
           font-size: 12px;
           font-style: italic;
         }
+
         .review-body-text {
           font-family: Georgia, serif;
           font-size: 14.5px;
           line-height: 1.6;
-          color: var(--tx);
+          color: #ffffff;
           margin: 0;
           width: 100%;
           white-space: pre-wrap;
         }
+
         .review-placeholder {
           font-family: Georgia, serif;
           font-size: 13px;
           font-style: italic;
-          color: var(--mu);
+          color: #fca5a5;
           margin: 0;
         }
+
         .review-error {
           font-size: 12px;
-          color: var(--err);
+          color: #fca5a5;
           margin: 0;
         }
+
         .typewriter-cursor {
           display: inline-block;
           width: 2px;
           height: 13px;
-          background: var(--ac);
+          background: #ffffff;
           margin-left: 3px;
           vertical-align: middle;
           animation: blink 0.7s infinite;
         }
+
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
+
         .card-ornament-center {
           text-align: center;
-          color: #ef4444;
+          color: #ffffff;
           font-size: 7px;
           margin: 6px 0 10px;
         }
+
         .full-luxury-copy-btn {
           width: 100%;
           height: 50px;
           border-radius: 999px;
-          background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+          background: #ffffff;
           border: none;
-          color: #991b1b;
-          font-size: 12.5px;
-          font-weight: 800;
+          color: #b91c1c;
+          font-size: 12px;
+          font-weight: 750;
           cursor: pointer;
-          box-shadow: 0 8px 22px rgba(0,0,0,0.3);
-          transition: transform 0.15s ease;
+          box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3);
+          transition: transform 0.15s ease, background 0.18s ease, box-shadow 0.18s ease;
         }
+
+        .full-luxury-copy-btn.copied {
+          background: #fecaca;
+        }
+
         .full-luxury-copy-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
+
         .full-luxury-copy-btn:active:not(:disabled) {
           transform: scale(0.98);
         }
+
         .card-disclaimer-note {
           font-size: 9.5px;
-          color: var(--mu);
+          color: #fecaca;
           text-align: center;
           margin: 8px 0 0;
           font-style: italic;
         }
+
         .quick-actions-card {
           width: 100%;
-          background: var(--card);
+          background: #7f1d1d;
           border-radius: 22px;
           padding: 18px 12px;
           box-sizing: border-box;
-          border: 1px solid var(--ln);
-          box-shadow: 0 10px 28px var(--sh);
+          border: 1px solid #991b1b;
+          box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
           margin-bottom: 16px;
         }
+
         .soft-action-grid {
           display: flex;
           flex-direction: column;
@@ -767,88 +1035,93 @@ END:VCARD`;
           gap: 16px;
           width: 100%;
         }
+
         .action-row-upper {
           display: flex;
           justify-content: center;
           gap: 14px;
           width: 100%;
         }
+
         .action-row-lower {
           display: flex;
           justify-content: center;
-          gap: 18px;
+          gap: 14px;
           width: 100%;
         }
+
         .soft-circle-action {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 5px;
           text-decoration: none !important;
-          color: var(--tx2);
+          color: #ffffff;
           background: transparent;
           border: none;
           cursor: pointer;
           padding: 0;
           transition: transform 0.15s ease;
         }
+
         .soft-circle-action:active {
           transform: scale(0.92);
         }
+
         .icon-disc {
           width: 50px;
           height: 50px;
           border-radius: 50%;
-          background: var(--soft);
+          background: #991b1b;
           display: grid;
           place-items: center;
-          box-shadow: 0 6px 16px var(--sh);
-          border: 1px solid var(--ln);
+          box-shadow: 0 3px 9px rgba(0, 0, 0, 0.2);
+          border: 1px solid #b91c1c;
           transition: all 0.2s ease;
         }
+
         .icon-disc svg {
           width: 20px;
           height: 20px;
-          stroke: var(--ic);
+          stroke: #ffffff;
           transition: stroke 0.2s ease;
         }
+
         .whatsapp-disc:hover { background: #25d366; border-color: #25d366; }
-        .whatsapp-disc:hover svg { stroke: #ffffff; }
-
         .call-disc:hover { background: #007aff; border-color: #007aff; }
-        .call-disc:hover svg { stroke: #ffffff; }
-
-        .contact-disc:hover { background: #ef4444; border-color: #ef4444; }
-        .contact-disc:hover svg { stroke: #ffffff; }
-
+        .contact-disc:hover { background: #ffffff; border-color: #ffffff; }
+        .contact-disc:hover svg { stroke: #b91c1c; }
         .map-disc:hover { background: #ea4335; border-color: #ea4335; }
-        .map-disc:hover svg { stroke: #ffffff; }
-
-        .insta-disc:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: transparent; }
-        .insta-disc:hover svg { stroke: #ffffff; }
-
+        .insta-disc:hover {
+          background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+          border-color: transparent;
+        }
+        .wa-channel-disc:hover { background: #25d366; border-color: #25d366; }
         .fb-disc:hover { background: #1877f2; border-color: #1877f2; }
-        .fb-disc:hover svg { stroke: #ffffff; }
+        .yt-disc:hover { background: #ff0000; border-color: #ff0000; }
 
         .icon-tag {
           font-size: 9.5px;
           font-weight: 700;
-          color: var(--tx2);
+          color: #ffffff;
         }
+
         .embedded-map-card {
           width: 100%;
-          background: var(--card);
+          background: #7f1d1d;
           border-radius: 22px;
           padding: 14px 16px;
           box-sizing: border-box;
-          border: 1px solid var(--ln);
-          box-shadow: 0 8px 24px var(--sh);
+          border: 1px solid #991b1b;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
           margin-bottom: 12px;
           text-align: left;
         }
+
         .map-card-header-link {
           text-decoration: none;
         }
+
         .map-card-header {
           display: flex;
           align-items: center;
@@ -856,45 +1129,52 @@ END:VCARD`;
           gap: 6px;
           font-size: 11.5px;
           font-weight: 800;
-          color: var(--tx);
+          color: #ffffff;
           margin-bottom: 8px;
         }
+
         .map-iframe-container {
           width: 100%;
           border-radius: 14px;
           overflow: hidden;
-          border: 1px solid var(--ln);
+          border: 1px solid #991b1b;
           margin-bottom: 8px;
         }
+
         .map-directions-link {
           font-size: 11px;
           font-weight: 750;
-          color: var(--ac);
+          color: #fca5a5;
           text-decoration: none;
           display: block;
           text-align: center;
           margin-bottom: 8px;
         }
+
         .address-highlight-box {
-          background: var(--soft);
+          background: #991b1b;
           border-radius: 12px;
           padding: 10px 12px;
-          border: 1px solid var(--ln);
+          border: 1px solid #b91c1c;
           margin-bottom: 8px;
         }
+
         .agency-clean-address {
           font-size: 10.5px;
-          color: var(--tx2);
+          color: #fecaca;
           margin: 0;
           line-height: 1.4;
           text-align: center;
         }
+
+        /* Mini Footer */
         .mini-footer {
           width: 100%;
           display: flex;
           justify-content: center;
           margin-top: 2px;
         }
+
         .mini-footer-pill {
           display: inline-flex;
           align-items: center;
@@ -902,23 +1182,26 @@ END:VCARD`;
           flex-wrap: wrap;
           gap: 4px;
           padding: 5px 12px;
-          border: 1px solid var(--ln);
+          border: 1px solid #991b1b;
           border-radius: 999px;
-          background: var(--card);
+          background: #7f1d1d;
           font-size: 8.5px;
           letter-spacing: 0.3px;
-          color: var(--mu);
+          color: #fecaca;
           line-height: 1.4;
         }
+
         .mini-footer-pill strong {
-          color: #fca5a5;
+          color: #ffffff;
           font-weight: 700;
         }
+
         .mini-footer-dot {
-          color: #ef4444;
+          color: #ffffff;
         }
+
         .mini-footer-pill a {
-          color: #fca5a5;
+          color: #ffffff;
           font-weight: 700;
           text-decoration: none;
         }
@@ -926,3 +1209,4 @@ END:VCARD`;
     </main>
   );
 }
+```
