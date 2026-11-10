@@ -22,7 +22,7 @@ const PRODUCT_WORD = 'food';
 
 // Restaurant dishes / menu series (weighted for variety)
 const MENU_SERIES = [
-  { n: 'Starters', w: 3, variants: [['Paneer Tikka', 3], [['Spring Rolls', 2], ['Crispy Corn', 2]] },
+  { n: 'Starters', w: 3, variants: [['Paneer Tikka', 3], ['Spring Rolls', 2], ['Crispy Corn', 2]] },
   { n: 'Main Course', w: 8, variants: [['Butter Chicken', 3], ['Dal Makhani', 3], ['Shahi Paneer', 2], ['Kadhai Paneer', 2]] },
   { n: 'Breads & Rolls', w: 5, variants: [['Butter Naan', 3], ['Stuffed Paratha', 2], ['Rumali Roti', 2]] },
   { n: 'Chinese & Snacks', w: 4, variants: [['Chowmein', 3], ['Momos', 3], ['Manchurian', 2]] },
@@ -95,7 +95,7 @@ const CHIPS = {
   'Fresh & Hot': { id: 'chip_fresh', text: 'food was served fresh and piping hot', must: /fresh|hot|garam|ekdum/i },
   'Clean Ambience': { id: 'chip_clean', text: 'the place was clean, hygienic, and well maintained', must: /clean|hygiene|safai|saaf|maintained/i },
   'Fast Service': { id: 'chip_fast', text: 'the service speed was quick and staff was attentive', must: /fast|quick|jaldi|service|staff/i },
-  ' Yamuna Vihar': { id: 'chip_location', text: 'the location in Yamuna Vihar was very easy to reach', must: /yamuna vihar|location|jagah|metro|market/i },
+  'Yamuna Vihar': { id: 'chip_location', text: 'the location in Yamuna Vihar was very easy to reach', must: /yamuna vihar|location|jagah|metro|market/i },
   'Good Quantity': { id: 'chip_qty', text: 'the portion size and quantity were very satisfying', must: /quantity|portion|pet|bhar|zyada/i },
 };
 
